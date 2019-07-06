@@ -1,4 +1,4 @@
-arc-elasticsearch-pipeline-plugin provides the ElasticsearchExtract and ElasticsearchLoad stages.
+arc-mongo-pipeline-plugin provides the MongoExtract and MongoLoad stages.
 
 ## Documentation
 
