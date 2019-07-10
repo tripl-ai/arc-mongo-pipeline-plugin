@@ -23,9 +23,9 @@ import ai.tripl.arc.util.MetadataUtils
 import ai.tripl.arc.util.ListenerUtils
 import ai.tripl.arc.util.Utils
 
-class MongoLoad extends PipelineStagePlugin {
+class MongoDBLoad extends PipelineStagePlugin {
 
-  val version = Utils.getFrameworkVersion
+  val version = ai.tripl.arc.mongodb.BuildInfo.version
 
   def instantiate(index: Int, config: com.typesafe.config.Config)(implicit spark: SparkSession, logger: ai.tripl.arc.util.log.logger.Logger, arcContext: ARCContext): Either[List[ai.tripl.arc.config.Error.StageError], PipelineStage] = {
     import ai.tripl.arc.config.ConfigReader._
@@ -46,7 +46,7 @@ class MongoLoad extends PipelineStagePlugin {
     (name, description, inputView, numPartitions, saveMode, partitionBy, invalidKeys) match {
       case (Right(name), Right(description), Right(inputView), Right(numPartitions), Right(saveMode), Right(partitionBy), Right(invalidKeys)) => 
       
-        val stage = MongoLoadStage(
+        val stage = MongoDBLoadStage(
           plugin=this,
           name=name,
           description=description,
@@ -74,8 +74,8 @@ class MongoLoad extends PipelineStagePlugin {
 }
 
 
-case class MongoLoadStage(
-    plugin: MongoLoad,
+case class MongoDBLoadStage(
+    plugin: MongoDBLoad,
     name: String, 
     description: Option[String], 
     inputView: String, 
@@ -87,18 +87,18 @@ case class MongoLoadStage(
   ) extends PipelineStage {
 
   override def execute()(implicit spark: SparkSession, logger: ai.tripl.arc.util.log.logger.Logger, arcContext: ARCContext): Option[DataFrame] = {
-    MongoLoadStage.execute(this)
+    MongoDBLoadStage.execute(this)
   }
 }
 
-object MongoLoadStage {
+object MongoDBLoadStage {
 
-  def execute(stage: MongoLoadStage)(implicit spark: SparkSession, logger: ai.tripl.arc.util.log.logger.Logger, arcContext: ARCContext): Option[DataFrame] = {
+  def execute(stage: MongoDBLoadStage)(implicit spark: SparkSession, logger: ai.tripl.arc.util.log.logger.Logger, arcContext: ARCContext): Option[DataFrame] = {
 
     val df = spark.table(stage.inputView)   
 
     if (arcContext.isStreaming) {
-      throw new Exception("MongoLoad does not support streaming mode.") with DetailException {
+      throw new Exception("MongoDBLoad does not support streaming mode.") with DetailException {
         override val detail = stage.stageDetail          
       }
     }       

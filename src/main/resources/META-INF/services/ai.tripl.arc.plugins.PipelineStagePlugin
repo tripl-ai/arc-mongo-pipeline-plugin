@@ -1,2 +1,2 @@
-ai.tripl.arc.extract.MongoExtract
-ai.tripl.arc.load.MongoLoad
+ai.tripl.arc.extract.MongoDBExtract
+ai.tripl.arc.load.MongoDBLoad

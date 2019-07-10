@@ -1,4 +1,4 @@
-arc-mongo-pipeline-plugin provides the MongoExtract and MongoLoad stages.
+arc-mongodb-pipeline-plugin provides the MongoDBExtract and MongoDBLoad stages.
 
 ## Documentation
 

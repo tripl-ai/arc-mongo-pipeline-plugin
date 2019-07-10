@@ -24,9 +24,9 @@ import ai.tripl.arc.util.ExtractUtils
 import ai.tripl.arc.util.MetadataUtils
 import ai.tripl.arc.util.Utils
 
-class MongoExtract extends PipelineStagePlugin {
+class MongoDBExtract extends PipelineStagePlugin {
 
-  val version = Utils.getFrameworkVersion
+  val version = ai.tripl.arc.mongodb.BuildInfo.version
 
   def instantiate(index: Int, config: com.typesafe.config.Config)(implicit spark: SparkSession, logger: ai.tripl.arc.util.log.logger.Logger, arcContext: ARCContext): Either[List[ai.tripl.arc.config.Error.StageError], PipelineStage] = {
     import ai.tripl.arc.config.ConfigReader._
@@ -52,7 +52,7 @@ class MongoExtract extends PipelineStagePlugin {
       case (Right(name), Right(description), Right(extractColumns), Right(schemaView), Right(outputView), Right(persist), Right(numPartitions), Right(authentication), Right(partitionBy), Right(invalidKeys)) => 
         val schema = if(c.hasPath("schemaView")) Left(schemaView) else Right(extractColumns)
         
-        val stage = MongoExtractStage(
+        val stage = MongoDBExtractStage(
           plugin=this,
           name=name,
           description=description,
@@ -80,8 +80,8 @@ class MongoExtract extends PipelineStagePlugin {
   }
 }
 
-case class MongoExtractStage(
-  plugin: MongoExtract, 
+case class MongoDBExtractStage(
+  plugin: MongoDBExtract, 
   name: String, 
   description: Option[String], 
   schema: Either[String, List[ExtractColumn]],
@@ -94,16 +94,16 @@ case class MongoExtractStage(
   partitionBy: List[String]) extends PipelineStage {
 
   override def execute()(implicit spark: SparkSession, logger: ai.tripl.arc.util.log.logger.Logger, arcContext: ARCContext): Option[DataFrame] = {
-    MongoExtractStage.execute(this)
+    MongoDBExtractStage.execute(this)
   }
 }
 
-object MongoExtractStage {
+object MongoDBExtractStage {
 
-  def execute(stage: MongoExtractStage)(implicit spark: SparkSession, logger: ai.tripl.arc.util.log.logger.Logger, arcContext: ARCContext): Option[DataFrame] = {
+  def execute(stage: MongoDBExtractStage)(implicit spark: SparkSession, logger: ai.tripl.arc.util.log.logger.Logger, arcContext: ARCContext): Option[DataFrame] = {
 
     if (arcContext.isStreaming) {
-      throw new Exception("MongoLoad does not support streaming mode.") with DetailException {
+      throw new Exception("MongoDBExtract does not support streaming mode.") with DetailException {
         override val detail = stage.stageDetail          
       }
     }    
@@ -133,7 +133,7 @@ object MongoExtractStage {
         stage.stageDetail.put("records", Integer.valueOf(0))
         optionSchema match {
           case Some(s) => spark.createDataFrame(spark.sparkContext.emptyRDD[Row], s)
-          case None => throw new Exception(s"MongoExtract has produced 0 columns and no schema has been provided to create an empty dataframe.")
+          case None => throw new Exception(s"MongoDBExtract has produced 0 columns and no schema has been provided to create an empty dataframe.")
         }
       } else {
         df

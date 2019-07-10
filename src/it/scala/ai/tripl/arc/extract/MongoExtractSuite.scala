@@ -17,7 +17,7 @@ import ai.tripl.arc.api.API._
 import ai.tripl.arc.util._
 import ai.tripl.arc.util.ControlUtils._
 
-class MongoExtractSuite extends FunSuite with BeforeAndAfter {
+class MongoDBExtractSuite extends FunSuite with BeforeAndAfter {
 
   var session: SparkSession = _  
 
@@ -47,7 +47,7 @@ class MongoExtractSuite extends FunSuite with BeforeAndAfter {
     session.stop
   }
 
-  test("MongoExtract") {
+  test("MongoDBExtract") {
     implicit val spark = session
     import spark.implicits._
     implicit val logger = TestUtils.getLogger()
@@ -56,7 +56,7 @@ class MongoExtractSuite extends FunSuite with BeforeAndAfter {
     val conf = s"""{
       "stages": [
         {
-          "type": "MongoExtract",
+          "type": "MongoDBExtract",
           "name": "load customers",
           "environments": [
             "production",
@@ -88,7 +88,7 @@ class MongoExtractSuite extends FunSuite with BeforeAndAfter {
     }
   }
 
-  test("MongoExtract: Missing collection") {
+  test("MongoDBExtract: Missing collection") {
     implicit val spark = session
     import spark.implicits._
     implicit val logger = TestUtils.getLogger()
@@ -97,7 +97,7 @@ class MongoExtractSuite extends FunSuite with BeforeAndAfter {
     val conf = s"""{
       "stages": [
         {
-          "type": "MongoExtract",
+          "type": "MongoDBExtract",
           "name": "load customers",
           "environments": [
             "production",
@@ -126,7 +126,7 @@ class MongoExtractSuite extends FunSuite with BeforeAndAfter {
         val thrown0 = intercept[Exception with DetailException] {
           ARC.run(pipeline)(spark, logger, arcContext)
         }
-        assert(thrown0.getMessage === "MongoExtract has produced 0 columns and no schema has been provided to create an empty dataframe.")
+        assert(thrown0.getMessage === "MongoDBExtract has produced 0 columns and no schema has been provided to create an empty dataframe.")
       }
     }
   }  

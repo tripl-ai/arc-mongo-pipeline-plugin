@@ -17,7 +17,7 @@ import ai.tripl.arc.api.API._
 import ai.tripl.arc.util._
 import ai.tripl.arc.util.ControlUtils._
 
-class MongoLoadSuite extends FunSuite with BeforeAndAfter {
+class MongoDBLoadSuite extends FunSuite with BeforeAndAfter {
 
   var session: SparkSession = _  
 
@@ -48,7 +48,7 @@ class MongoLoadSuite extends FunSuite with BeforeAndAfter {
     session.stop
   }
 
-  test("MongoLoad") {
+  test("MongoDBLoad") {
     implicit val spark = session
     import spark.implicits._
     implicit val logger = TestUtils.getLogger()
@@ -60,7 +60,7 @@ class MongoLoadSuite extends FunSuite with BeforeAndAfter {
     val conf = s"""{
       "stages": [
         {
-          "type": "MongoLoad",
+          "type": "MongoDBLoad",
           "name": "load customers",
           "environments": [
             "production",
