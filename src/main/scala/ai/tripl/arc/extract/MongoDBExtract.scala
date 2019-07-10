@@ -46,7 +46,6 @@ class MongoDBExtract extends PipelineStagePlugin {
     val authentication = readAuthentication("authentication")
     val extractColumns = if(c.hasPath("schemaURI")) getValue[String]("schemaURI") |> parseURI("schemaURI") _ |> getExtractColumns("schemaURI", authentication) _ else Right(List.empty)
     val schemaView = if(c.hasPath("schemaView")) getValue[String]("schemaView") else Right("")  
-    val basePath = getOptionalValue[String]("basePath")
 
     (name, description, extractColumns, schemaView, outputView, persist, numPartitions, authentication, partitionBy, invalidKeys) match {
       case (Right(name), Right(description), Right(extractColumns), Right(schemaView), Right(outputView), Right(persist), Right(numPartitions), Right(authentication), Right(partitionBy), Right(invalidKeys)) => 
