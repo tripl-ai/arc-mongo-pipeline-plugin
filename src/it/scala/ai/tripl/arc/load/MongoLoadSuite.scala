@@ -75,7 +75,7 @@ class MongoDBLoadSuite extends FunSuite with BeforeAndAfter {
           "inputView": "${inputView}"
         },
         {
-          "type": "MongoExtract",
+          "type": "MongoDBExtract",
           "name": "load customers",
           "environments": [
             "production",
