@@ -12,10 +12,11 @@ import org.apache.commons.io.IOUtils
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 
-import ai.tripl.arc.api._
 import ai.tripl.arc.api.API._
-import ai.tripl.arc.util._
+import ai.tripl.arc.api._
+import ai.tripl.arc.config.ArcPipeline
 import ai.tripl.arc.util.ControlUtils._
+import ai.tripl.arc.util._
 
 class MongoDBExtractSuite extends FunSuite with BeforeAndAfter {
 
@@ -73,7 +74,7 @@ class MongoDBExtractSuite extends FunSuite with BeforeAndAfter {
     }"""
 
     
-    val pipelineEither = ConfigUtils.parseConfig(Left(conf), arcContext)
+    val pipelineEither = ArcPipeline.parseConfig(Left(conf), arcContext)
 
     // assert graph created
     pipelineEither match {
@@ -114,7 +115,7 @@ class MongoDBExtractSuite extends FunSuite with BeforeAndAfter {
     }"""
 
     
-    val pipelineEither = ConfigUtils.parseConfig(Left(conf), arcContext)
+    val pipelineEither = ArcPipeline.parseConfig(Left(conf), arcContext)
 
     // assert graph created
     pipelineEither match {
