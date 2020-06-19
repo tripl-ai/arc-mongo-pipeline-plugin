@@ -21,7 +21,7 @@ services:
     working_dir: /app
 
   mongo:
-    image: mongo:3.4.21-xenial
+    image: mongo:4.2.8-bionic
     networks:
       - arc-integration
     ports:
@@ -30,16 +30,3 @@ services:
       MONGO_INITDB_DATABASE: arc
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
-
-  mongo-express:
-    image: mongo-express
-    restart: always
-    depends_on:
-      - mongo
-    networks:
-      - arc-integration      
-    ports:
-      - 8081:8081
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: example
