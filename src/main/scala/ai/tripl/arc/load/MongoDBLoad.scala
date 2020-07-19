@@ -23,9 +23,26 @@ import ai.tripl.arc.util.MetadataUtils
 import ai.tripl.arc.util.ListenerUtils
 import ai.tripl.arc.util.Utils
 
-class MongoDBLoad extends PipelineStagePlugin {
+class MongoDBLoad extends PipelineStagePlugin with JupyterCompleter {
 
   val version = ai.tripl.arc.mongodb.BuildInfo.version
+
+  val snippet = """{
+    |  "type": "MongoDBLoad",
+    |  "name": "MongoDBLoad",
+    |  "environments": [
+    |    "production",
+    |    "test"
+    |  ],
+    |  "inputView": "inputView",
+    |  "options": {
+    |    "uri": "mongodb://username:password@mongo:27017",
+    |    "database": "database",
+    |    "collection": "collection"
+    |  }
+    |}""".stripMargin
+
+  val documentationURI = new java.net.URI(s"${baseURI}/load/#mongodbload")
 
   def instantiate(index: Int, config: com.typesafe.config.Config)(implicit spark: SparkSession, logger: ai.tripl.arc.util.log.logger.Logger, arcContext: ARCContext): Either[List[ai.tripl.arc.config.Error.StageError], PipelineStage] = {
     import ai.tripl.arc.config.ConfigReader._
@@ -41,11 +58,11 @@ class MongoDBLoad extends PipelineStagePlugin {
     val numPartitions = getOptionalValue[Int]("numPartitions")
     val saveMode = getValue[String]("saveMode", default = Some("Overwrite"), validValues = "Append" :: "ErrorIfExists" :: "Ignore" :: "Overwrite" :: Nil) |> parseSaveMode("saveMode") _
     val params = readMap("params", c)
-    val invalidKeys = checkValidKeys(c)(expectedKeys)  
+    val invalidKeys = checkValidKeys(c)(expectedKeys)
 
     (name, description, inputView, numPartitions, saveMode, partitionBy, invalidKeys) match {
-      case (Right(name), Right(description), Right(inputView), Right(numPartitions), Right(saveMode), Right(partitionBy), Right(invalidKeys)) => 
-      
+      case (Right(name), Right(description), Right(inputView), Right(numPartitions), Right(saveMode), Right(partitionBy), Right(invalidKeys)) =>
+
         val stage = MongoDBLoadStage(
           plugin=this,
           name=name,
@@ -58,7 +75,7 @@ class MongoDBLoad extends PipelineStagePlugin {
           params=params
         )
 
-        stage.stageDetail.put("inputView", inputView)  
+        stage.stageDetail.put("inputView", inputView)
         stage.stageDetail.put("partitionBy", partitionBy.asJava)
         stage.stageDetail.put("saveMode", saveMode.toString.toLowerCase)
         stage.stageDetail.put("params", params.asJava)
@@ -76,15 +93,15 @@ class MongoDBLoad extends PipelineStagePlugin {
 
 case class MongoDBLoadStage(
     plugin: MongoDBLoad,
-    name: String, 
-    description: Option[String], 
-    inputView: String, 
-    options: Map[String, String], 
-    partitionBy: List[String], 
-    numPartitions: Option[Int], 
-    saveMode: SaveMode, 
+    name: String,
+    description: Option[String],
+    inputView: String,
+    options: Map[String, String],
+    partitionBy: List[String],
+    numPartitions: Option[Int],
+    saveMode: SaveMode,
     params: Map[String, String]
-  ) extends PipelineStage {
+  ) extends LoadPipelineStage {
 
   override def execute()(implicit spark: SparkSession, logger: ai.tripl.arc.util.log.logger.Logger, arcContext: ARCContext): Option[DataFrame] = {
     MongoDBLoadStage.execute(this)
@@ -95,13 +112,13 @@ object MongoDBLoadStage {
 
   def execute(stage: MongoDBLoadStage)(implicit spark: SparkSession, logger: ai.tripl.arc.util.log.logger.Logger, arcContext: ARCContext): Option[DataFrame] = {
 
-    val df = spark.table(stage.inputView)   
+    val df = spark.table(stage.inputView)
 
     if (arcContext.isStreaming) {
       throw new Exception("MongoDBLoad does not support streaming mode.") with DetailException {
-        override val detail = stage.stageDetail          
+        override val detail = stage.stageDetail
       }
-    }       
+    }
 
     val listener = ListenerUtils.addStageCompletedListener(stage.stageDetail)
 
@@ -128,7 +145,7 @@ object MongoDBLoadStage {
       }
     }
 
-    spark.sparkContext.removeSparkListener(listener)           
+    spark.sparkContext.removeSparkListener(listener)
 
     Option(df)
   }
