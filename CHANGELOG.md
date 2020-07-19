@@ -1,5 +1,9 @@
 # Change Log
 
+## 1.4.0
+
+- add snippets and documentation links to implement `JupyterCompleter`.
+
 ## 1.3.0
 
 - update to Arc 3.0.0
