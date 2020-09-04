@@ -1,6 +1,6 @@
 import Dependencies._
 
-lazy val scala212 = "2.12.11"
+lazy val scala212 = "2.12.12"
 lazy val supportedScalaVersions = List(scala212)
 
 lazy val root = (project in file(".")).
@@ -30,7 +30,7 @@ lazy val root = (project in file(".")).
 resolvers += Resolver.mavenLocal
 publishM2Configuration := publishM2Configuration.value.withOverwrite(true)
 
-fork in run := true  
+fork in run := true
 
 scalacOptions := Seq("-target:jvm-1.8", "-unchecked", "-deprecation")
 
