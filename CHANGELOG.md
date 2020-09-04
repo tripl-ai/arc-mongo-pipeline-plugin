@@ -1,5 +1,10 @@
 # Change Log
 
+## 1.5.0
+
+- update to Arc 3.2.0
+- update to mongo-spark-connector 3.0.0
+
 ## 1.4.0
 
 - add snippets and documentation links to implement `JupyterCompleter`.

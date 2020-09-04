@@ -50,8 +50,9 @@ class MongoDBExtract extends PipelineStagePlugin with JupyterCompleter {
     import ai.tripl.arc.config.ConfigUtils._
     implicit val c = config
 
-    val expectedKeys = "type" :: "name" :: "description" :: "environments" :: "inputURI" :: "outputView" :: "authentication" :: "options" :: "numPartitions" :: "partitionBy" :: "persist" :: "schemaURI" :: "schemaView" :: "params" :: Nil
+    val expectedKeys = "type" :: "id" :: "name" :: "description" :: "environments" :: "inputURI" :: "outputView" :: "authentication" :: "options" :: "numPartitions" :: "partitionBy" :: "persist" :: "schemaURI" :: "schemaView" :: "params" :: Nil
     val invalidKeys = checkValidKeys(c)(expectedKeys)
+    val id = getOptionalValue[String]("id")
     val name = getValue[String]("name")
     val params = readMap("params", c)
     val options = readMap("options", c)
@@ -61,15 +62,16 @@ class MongoDBExtract extends PipelineStagePlugin with JupyterCompleter {
     val numPartitions = getOptionalValue[Int]("numPartitions")
     val partitionBy = getValue[StringList]("partitionBy", default = Some(Nil))
     val authentication = readAuthentication("authentication")
-    val extractColumns = if(c.hasPath("schemaURI")) getValue[String]("schemaURI") |> parseURI("schemaURI") _ |> getExtractColumns("schemaURI", authentication) _ else Right(List.empty)
+    val extractColumns = if(c.hasPath("schemaURI")) getValue[String]("schemaURI") |> parseURI("schemaURI") _ |> textContentForURI("schemaURI", authentication) |> getExtractColumns("schemaURI") _ else Right(List.empty)
     val schemaView = if(c.hasPath("schemaView")) getValue[String]("schemaView") else Right("")
 
-    (name, description, extractColumns, schemaView, outputView, persist, numPartitions, authentication, partitionBy, invalidKeys) match {
-      case (Right(name), Right(description), Right(extractColumns), Right(schemaView), Right(outputView), Right(persist), Right(numPartitions), Right(authentication), Right(partitionBy), Right(invalidKeys)) =>
+    (id, name, description, extractColumns, schemaView, outputView, persist, numPartitions, authentication, partitionBy, invalidKeys) match {
+      case (Right(id), Right(name), Right(description), Right(extractColumns), Right(schemaView), Right(outputView), Right(persist), Right(numPartitions), Right(authentication), Right(partitionBy), Right(invalidKeys)) =>
         val schema = if(c.hasPath("schemaView")) Left(schemaView) else Right(extractColumns)
 
         val stage = MongoDBExtractStage(
           plugin=this,
+          id=id,
           name=name,
           description=description,
           schema=schema,
@@ -88,7 +90,7 @@ class MongoDBExtract extends PipelineStagePlugin with JupyterCompleter {
 
         Right(stage)
       case _ =>
-        val allErrors: Errors = List(name, description, schemaView, outputView, persist, numPartitions, authentication, extractColumns, partitionBy, invalidKeys).collect{ case Left(errs) => errs }.flatten
+        val allErrors: Errors = List(id,name, description, schemaView, outputView, persist, numPartitions, authentication, extractColumns, partitionBy, invalidKeys).collect{ case Left(errs) => errs }.flatten
         val stageName = stringOrDefault(name, "unnamed stage")
         val err = StageError(index, stageName, c.origin.lineNumber, allErrors)
         Left(err :: Nil)
@@ -98,6 +100,7 @@ class MongoDBExtract extends PipelineStagePlugin with JupyterCompleter {
 
 case class MongoDBExtractStage(
   plugin: MongoDBExtract,
+  id: Option[String],
   name: String,
   description: Option[String],
   schema: Either[String, List[ExtractColumn]],
