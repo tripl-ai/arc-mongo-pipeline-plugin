@@ -12,3 +12,5 @@ spark-warehouse
 spark/
 target
 tmp
+project/metals.sbt
+.vscode

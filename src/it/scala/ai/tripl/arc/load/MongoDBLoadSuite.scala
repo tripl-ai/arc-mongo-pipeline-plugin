@@ -20,7 +20,7 @@ import ai.tripl.arc.util._
 
 class MongoDBLoadSuite extends FunSuite with BeforeAndAfter {
 
-  var session: SparkSession = _  
+  var session: SparkSession = _
 
   val inputView = "inputView"
   val outputView = "outputView"
@@ -33,14 +33,14 @@ class MongoDBLoadSuite extends FunSuite with BeforeAndAfter {
     implicit val spark = SparkSession
                   .builder()
                   .master("local[*]")
-                  .config("spark.ui.port", "9999")              
+                  .config("spark.ui.port", "9999")
                   .appName("Spark ETL Test")
                   .getOrCreate()
     spark.sparkContext.setLogLevel("INFO")
     implicit val logger = TestUtils.getLogger()
 
     // set for deterministic timezone
-    spark.conf.set("spark.sql.session.timeZone", "UTC")   
+    spark.conf.set("spark.sql.session.timeZone", "UTC")
 
     session = spark
   }
@@ -87,11 +87,11 @@ class MongoDBLoadSuite extends FunSuite with BeforeAndAfter {
             "collection": "customer"
           }
           "outputView": "${outputView}"
-        }           
+        }
       ]
     }"""
 
-    
+
     val pipelineEither = ArcPipeline.parseConfig(Left(conf), arcContext)
 
     // assert graph created

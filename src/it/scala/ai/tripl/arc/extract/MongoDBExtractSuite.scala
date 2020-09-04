@@ -20,7 +20,7 @@ import ai.tripl.arc.util._
 
 class MongoDBExtractSuite extends FunSuite with BeforeAndAfter {
 
-  var session: SparkSession = _  
+  var session: SparkSession = _
 
   val outputView = "actual"
   val user = "root"
@@ -32,14 +32,14 @@ class MongoDBExtractSuite extends FunSuite with BeforeAndAfter {
     implicit val spark = SparkSession
                   .builder()
                   .master("local[*]")
-                  .config("spark.ui.port", "9999")              
+                  .config("spark.ui.port", "9999")
                   .appName("Spark ETL Test")
                   .getOrCreate()
     spark.sparkContext.setLogLevel("INFO")
     implicit val logger = TestUtils.getLogger()
 
     // set for deterministic timezone
-    spark.conf.set("spark.sql.session.timeZone", "UTC")   
+    spark.conf.set("spark.sql.session.timeZone", "UTC")
 
     session = spark
   }
@@ -69,11 +69,11 @@ class MongoDBExtractSuite extends FunSuite with BeforeAndAfter {
             "collection": "startup_log"
           }
           "outputView": "customer"
-        }   
+        }
       ]
     }"""
 
-    
+
     val pipelineEither = ArcPipeline.parseConfig(Left(conf), arcContext)
 
     // assert graph created
@@ -110,11 +110,11 @@ class MongoDBExtractSuite extends FunSuite with BeforeAndAfter {
             "collection": "none"
           }
           "outputView": "customer"
-        }   
+        }
       ]
     }"""
 
-    
+
     val pipelineEither = ArcPipeline.parseConfig(Left(conf), arcContext)
 
     // assert graph created
@@ -130,6 +130,6 @@ class MongoDBExtractSuite extends FunSuite with BeforeAndAfter {
         assert(thrown0.getMessage === "MongoDBExtract has produced 0 columns and no schema has been provided to create an empty dataframe.")
       }
     }
-  }  
+  }
 
 }
