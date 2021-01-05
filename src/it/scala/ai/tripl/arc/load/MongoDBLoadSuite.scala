@@ -96,10 +96,7 @@ class MongoDBLoadSuite extends FunSuite with BeforeAndAfter {
 
     // assert graph created
     pipelineEither match {
-      case Left(err) => {
-        println(err)
-        assert(false)
-      }
+      case Left(err) => fail(err.toString)
       case Right((pipeline, _)) => {
         val df = ARC.run(pipeline)(spark, logger, arcContext)
         assert(df.get.count != 0)

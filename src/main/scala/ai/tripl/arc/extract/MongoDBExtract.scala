@@ -28,13 +28,11 @@ class MongoDBExtract extends PipelineStagePlugin with JupyterCompleter {
 
   val version = ai.tripl.arc.mongodb.BuildInfo.version
 
-  val snippet = """{
+  def snippet()(implicit arcContext: ARCContext): String = {
+    s"""{
     |  "type": "MongoDBExtract",
     |  "name": "MongoDBExtract",
-    |  "environments": [
-    |    "production",
-    |    "test"
-    |  ],
+    |  "environments": [${arcContext.completionEnvironments.map { env => s""""${env}""""}.mkString(", ")}],
     |  "options": {
     |    "uri": "mongodb://username:password@mongo:27017",
     |    "database": "database",
@@ -42,6 +40,7 @@ class MongoDBExtract extends PipelineStagePlugin with JupyterCompleter {
     |  },
     |  "outputView": "customers"
     |}""".stripMargin
+  }
 
   val documentationURI = new java.net.URI(s"${baseURI}/extract/#mongoextract")
 
@@ -86,7 +85,6 @@ class MongoDBExtract extends PipelineStagePlugin with JupyterCompleter {
 
         stage.stageDetail.put("outputView", outputView)
         stage.stageDetail.put("persist", java.lang.Boolean.valueOf(persist))
-        stage.stageDetail.put("params", params.asJava)
 
         Right(stage)
       case _ =>
