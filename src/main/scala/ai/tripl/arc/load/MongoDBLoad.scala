@@ -27,13 +27,11 @@ class MongoDBLoad extends PipelineStagePlugin with JupyterCompleter {
 
   val version = ai.tripl.arc.mongodb.BuildInfo.version
 
-  val snippet = """{
+  def snippet()(implicit arcContext: ARCContext): String = {
+    s"""{
     |  "type": "MongoDBLoad",
     |  "name": "MongoDBLoad",
-    |  "environments": [
-    |    "production",
-    |    "test"
-    |  ],
+    |  "environments": [${arcContext.completionEnvironments.map { env => s""""${env}""""}.mkString(", ")}],
     |  "inputView": "inputView",
     |  "options": {
     |    "uri": "mongodb://username:password@mongo:27017",
@@ -41,6 +39,7 @@ class MongoDBLoad extends PipelineStagePlugin with JupyterCompleter {
     |    "collection": "collection"
     |  }
     |}""".stripMargin
+  }
 
   val documentationURI = new java.net.URI(s"${baseURI}/load/#mongodbload")
 
